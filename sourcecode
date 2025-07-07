@@ -1,0 +1,51 @@
+!pip install scapy
+
+from scapy.all import sniff, IP, TCP, UDP
+
+def packet_callback(packet):
+    if IP in packet:
+        ip_layer = packet[IP]
+        print(f"Source IP: {ip_layer.src}")
+        print(f"Destination IP: {ip_layer.dst}")
+
+        if TCP in packet:
+            tcp_layer = packet[TCP]
+            print(f"Protocol: TCP")
+            print(f"Source Port: {tcp_layer.sport}")
+            print(f"Destination Port: {tcp_layer.dport}")
+            print(f"Payload: {bytes(tcp_layer.payload)}")
+        elif UDP in packet:
+            udp_layer = packet[UDP]
+            print(f"Protocol: UDP")
+            print(f"Source Port: {udp_layer.sport}")
+            print(f"Destination Port: {udp_layer.dport}")
+            print(f"Payload: {bytes(udp_layer.payload)}")
+        else:
+            print("Protocol: Other")
+
+        print("-" * 30)
+
+try:
+    print("Starting packet capture (this will only work in a local environment with scapy)...")
+    # Sniff for 10 packets
+    sniff(prn=packet_callback, count=10)
+except Exception as e:
+    print(f"An error occurred: {e}")
+    print("Packet sniffing with scapy often requires root/administrator privileges and direct access to network interfaces, which is not available in Google Colab's environment.")
+    print("This code demonstrates the concept and should be run in a local Python environment with scapy installed.")
+
+import socket
+
+def basic_socket_sniff():
+    print("\nStarting basic socket sniff (illustrative, won't work in Colab)...")
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
+
+        print("Attempting to receive data (this is unlikely to work in Colab)...")
+        data, addr = s.recvfrom(65565)
+        print(f"Received {len(data)} bytes from {addr}")
+        print(f"Data: {data[:50]}...")
+
+    except Exception as e:
+        print(f"An error occurred during socket sniffing: {e}")
+        print("Raw socket sniffing typically requires root/administrator privileges and direct network access, which is not available in Google Colab.")
